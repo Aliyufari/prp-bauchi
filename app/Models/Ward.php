@@ -1,0 +1,31 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+
+class Ward extends Model
+{
+    use HasUuids;
+
+    protected $fillable = ['name', 'lga_id'];
+
+    public function lga(): BelongsTo
+    {
+        return $this->belongsTo(Lga::class);
+    }
+
+    public function pus(): HasMany
+    {
+        return $this->hasMany(Pu::class);
+    }
+
+    public function users(): MorphMany
+    {
+        return $this->morphMany(User::class, 'location');
+    }
+}

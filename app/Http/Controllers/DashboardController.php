@@ -204,7 +204,7 @@ class DashboardController extends Controller
     private function getAspirant(): array
     {
         return [
-            'name' => 'Alh. Usman Mohammed',
+            'name' => 'Sen. Shehu Buba Umar',
             'title' => 'PRP Governorship Aspirant',
             'state' => 'Bauchi State',
             'vision' => 'A united, peaceful and prosperous Bauchi State.',

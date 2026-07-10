@@ -13,11 +13,16 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $this->call([
+            StateSeeder::class,
+            ZoneSeeder::class,
+            LgaSeeder::class,
+            WardSeeder::class,
+            PuSeeder::class,
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+            RoleSeeder::class,
+            ConstituencySeeder::class,
+            UserSeeder::class,
         ]);
     }
 }

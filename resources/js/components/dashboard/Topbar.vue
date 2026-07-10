@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { Link, router } from '@inertiajs/vue3'
-import { Menu, Bell, Mail, User, Settings, LogOut, Shield } from 'lucide-vue-next'
+import { PanelLeft, Bell, Mail, User, Settings, LogOut } from 'lucide-vue-next'
 
 interface User {
   name: string
@@ -34,21 +34,20 @@ function logout() {
 
 <template>
   <header
-    class="bg-white border-b border-gray-100 flex items-center justify-between px-4 sm:px-6 sticky top-0 z-40 shadow-sm"
-    style="height: 64px;"
+    class="bg-white border-b border-gray-100 flex items-center justify-between px-3 sm:px-6 sticky top-0 z-30 shadow-sm h-16"
   >
     <!-- Left: Toggle + Title -->
-    <div class="flex items-center gap-3 min-w-0 flex-1">
+    <div class="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
       <button
         @click="$emit('toggle-sidebar')"
         class="p-2 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors flex-shrink-0"
         aria-label="Toggle sidebar"
       >
-        <Menu class="w-5 h-5" />
+        <PanelLeft class="w-5 h-5" />
       </button>
 
       <div class="min-w-0">
-        <h1 class="text-green-700 font-black leading-none tracking-tight truncate text-sm sm:text-base lg:text-lg">
+        <h1 class="text-green-700 font-black leading-none tracking-tight truncate text-xs xs:text-sm sm:text-base lg:text-lg">
           PRP BAUCHI STATE MANAGEMENT SYSTEM
         </h1>
         <p class="text-red-500 text-[10px] sm:text-xs italic font-semibold mt-0.5 hidden sm:block truncate">
@@ -58,26 +57,26 @@ function logout() {
     </div>
 
     <!-- Right: Actions -->
-    <div class="flex items-center gap-1 sm:gap-2 flex-shrink-0 ml-3">
+    <div class="flex items-center gap-0.5 sm:gap-2 flex-shrink-0 ml-2 sm:ml-3">
 
       <!-- Notifications -->
       <button
-        class="relative p-2 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
+        class="relative p-1.5 sm:p-2 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
         aria-label="Notifications"
       >
         <Bell class="w-5 h-5" />
-        <span class="absolute top-1 right-1 min-w-[16px] h-4 bg-red-500 text-white text-[9px] font-black rounded-full flex items-center justify-center px-0.5 leading-none">
+        <span class="absolute top-0.5 right-0.5 min-w-[16px] h-4 bg-red-500 text-white text-[9px] font-black rounded-full flex items-center justify-center px-0.5 leading-none">
           8
         </span>
       </button>
 
       <!-- Messages -->
       <button
-        class="relative p-2 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
+        class="relative p-1.5 sm:p-2 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors hidden xs:inline-flex"
         aria-label="Messages"
       >
         <Mail class="w-5 h-5" />
-        <span class="absolute top-1 right-1 min-w-[16px] h-4 bg-red-500 text-white text-[9px] font-black rounded-full flex items-center justify-center px-0.5 leading-none">
+        <span class="absolute top-0.5 right-0.5 min-w-[16px] h-4 bg-red-500 text-white text-[9px] font-black rounded-full flex items-center justify-center px-0.5 leading-none">
           15
         </span>
       </button>
@@ -89,7 +88,7 @@ function logout() {
       <div class="relative" v-click-outside="closeDropdown">
         <button
           @click="toggleDropdown"
-          class="flex items-center gap-2 pl-1 sm:pl-2 pr-2 sm:pr-3 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+          class="flex items-center gap-2 pl-1 sm:pl-2 pr-1 sm:pr-3 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
         >
           <!-- Avatar -->
           <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg overflow-hidden flex-shrink-0 shadow-sm ring-2 ring-gray-100">
@@ -109,7 +108,7 @@ function logout() {
           </div>
 
           <!-- Name + role -->
-          <div class="text-left hidden sm:block">
+          <div class="text-left hidden md:block">
             <p class="text-sm font-black text-gray-900 leading-none whitespace-nowrap">
               {{ user?.name ?? 'Admin' }}
             </p>
@@ -123,7 +122,7 @@ function logout() {
         <Transition name="dropdown">
           <div
             v-if="dropdownOpen"
-            class="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-50"
+            class="absolute right-0 mt-2 w-52 max-w-[calc(100vw-1.5rem)] bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-50"
             style="top: 100%;"
           >
             <!-- User info header -->

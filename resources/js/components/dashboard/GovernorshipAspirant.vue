@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Eye, Target } from 'lucide-vue-next'
+import aspirantImage from '@/assets/images/governor-aspirant.jpeg'
 
 const props = defineProps<{
   aspirant: {
@@ -35,7 +36,7 @@ const percent = (val: number | undefined) =>
     <!-- Profile -->
     <div class="flex items-center gap-3 min-w-0">
       <img
-        :src="aspirant.image || '/default-avatar.png'"
+        :src="aspirant.image || aspirantImage"
         :alt="aspirant.name"
         class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl object-cover flex-shrink-0 border border-green-100"
       />
