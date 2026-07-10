@@ -80,7 +80,7 @@ const currentDateTime = computed(() => {
 
           <select
             v-model="selectedLga"
-            class="text-xs sm:text-sm border border-gray-200 rounded-xl px-3 py-2 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 flex-1 min-w-[140px] sm:flex-none"
+            class="text-xs sm:text-sm text-gray-700 border border-gray-200 rounded-xl px-3 py-2 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 flex-1 min-w-[140px] sm:flex-none"
           >
             <option value="">All LGAs</option>
             <option v-for="lga in lgas" :key="lga" :value="lga">
@@ -90,7 +90,7 @@ const currentDateTime = computed(() => {
 
           <select
             v-model="selectedWard"
-            class="text-xs sm:text-sm border border-gray-200 rounded-xl px-3 py-2 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 flex-1 min-w-[140px] sm:flex-none"
+            class="text-xs sm:text-sm text-gray-700 border border-gray-200 rounded-xl px-3 py-2 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 flex-1 min-w-[140px] sm:flex-none"
           >
             <option value="">All Wards</option>
             <option v-for="ward in wards" :key="ward" :value="ward">

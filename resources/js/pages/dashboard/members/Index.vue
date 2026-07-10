@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { reactive, ref, watch } from 'vue'
-import { Head, router, useForm } from '@inertiajs/vue3'
+import { computed, ref, watch } from 'vue'
+import { Head, router } from '@inertiajs/vue3'
 import { Plus } from 'lucide-vue-next'
 import AppLayout from '@/layouts/AppLayout.vue'
 import DataTable from '@/components/tables/DataTable.vue'
@@ -10,10 +10,11 @@ import BulkActions from '@/components/tables/BulkActions.vue'
 import UserAvatarCell from '@/components/tables/UserAvatarCell.vue'
 import StatusBadge from '@/components/tables/StatusBadge.vue'
 import ActionDropdown from '@/components/tables/ActionDropdown.vue'
-import SlideOver from '@/components/ui/SlideOver.vue'
 import MemberStats from './components/MemberStats.vue'
 import MemberFilters from './components/MemberFilters.vue'
-import MemberForm from './components/MemberForm.vue'
+import CreateMember from './CreateMember.vue'
+import EditMember from './EditMember.vue'
+import ViewMember from './ViewMember.vue'
 import { columns } from './columns'
 import { useDataTable } from '@/composables/table/useDataTable'
 import type { Member, MemberStatistics, MemberFilterOptions, LocationOption } from '@/types/member'
@@ -80,102 +81,53 @@ watch(table.filters, () => {
 watch([table.sortBy, table.sortDirection, table.page, table.perPage], query)
 
 /* ---------------------------------------------------------------------- */
-/* Create / Edit modal                                                    */
+/* Panel state — Create, Edit, and View are now fully independent         */
 /* ---------------------------------------------------------------------- */
-type ModalMode = 'create' | 'edit' | null
-const modalMode = ref<ModalMode>(null)
+const creating = ref(false)
 const editingMember = ref<Member | null>(null)
 
-function emptyFormValues() {
-  return {
-    first_name: '',
-    middle_name: '' as string | null,
-    last_name: '',
-    email: '',
-    password: '',
-    phone: '' as string | null,
-    gender: null as string | null,
-    occupation: '' as string | null,
-    education_status: '' as string | null,
-    application_id: '' as string | null,
-    state_id: null as number | string | null,
-    zone_id: null as number | string | null,
-    lga_id: null as number | string | null,
-    ward_id: null as number | string | null,
-    pu_id: null as number | string | null,
-    mentor_name: '' as string | null,
-    mentor_status: false,
-    training_status: false,
-  }
+const viewingMemberId = ref<number | string | null>(null)
+const viewingMember = computed(() =>
+  viewingMemberId.value === null
+    ? null
+    : props.members.data.find((m) => m.id === viewingMemberId.value) ?? null,
+)
+
+function openCreate() {
+  creating.value = true
 }
 
-const form = useForm(emptyFormValues())
+function closeCreate() {
+  creating.value = false
+}
 
-function openCreateModal() {
+function openEdit(member: Member) {
+  editingMember.value = member
+}
+
+function closeEdit() {
   editingMember.value = null
-  form.clearErrors()
-  form.defaults(emptyFormValues())
-  form.reset()
-  modalMode.value = 'create'
 }
 
-function openEditModal(row: Member) {
-  editingMember.value = row
-  form.clearErrors()
-  const values = {
-    first_name: row.first_name,
-    middle_name: row.middle_name,
-    last_name: row.last_name,
-    email: row.email,
-    password: '',
-    phone: row.phone,
-    gender: row.gender,
-    occupation: row.occupation,
-    education_status: row.education_status,
-    application_id: row.member_no,
-    state_id: row.state_id,
-    zone_id: row.zone_id,
-    lga_id: row.lga_id,
-    ward_id: row.ward_id,
-    pu_id: row.pu_id,
-    mentor_name: row.mentor,
-    mentor_status: row.mentor_status,
-    training_status: row.training_status,
-  }
-  form.defaults(values)
-  form.reset()
-  Object.assign(form, values)
-  modalMode.value = 'edit'
+function openView(row: Member) {
+  viewingMemberId.value = row.id
 }
 
-function closeModal() {
-  modalMode.value = null
-  editingMember.value = null
-  form.clearErrors()
+function closeView() {
+  viewingMemberId.value = null
 }
 
-function submitForm() {
-  const options = {
-    preserveScroll: true,
-    onSuccess: () => closeModal(),
-  }
-  if (modalMode.value === 'create') {
-    form.post(route('members.store'), options)
-  } else if (modalMode.value === 'edit' && editingMember.value) {
-    form.patch(route('members.update', editingMember.value.id), options)
-  }
+function editFromView(member: Member) {
+  closeView()
+  openEdit(member)
 }
 
 /* ---------------------------------------------------------------------- */
 /* Row / bulk actions                                                     */
 /* ---------------------------------------------------------------------- */
-function viewMember(row: Member) {
-  router.visit(route('members.show', row.id))
-}
-
 function handleRowAction(key: string, row: Member) {
-  if (key === 'view') return viewMember(row)
-  if (key === 'edit') return openEditModal(row)
+  if (key === 'view') return openView(row)
+  if (key === 'edit') return openEdit(row)
   if (key === 'delete' && confirm(`Delete ${row.first_name} ${row.last_name}?`)) {
     router.delete(route('members.destroy', row.id), { preserveScroll: true })
   }
@@ -212,7 +164,7 @@ function toggleAll() {
         </div>
         <button
           type="button"
-          @click="openCreateModal"
+          @click="openCreate"
           class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-green-700 px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-green-800 active:bg-green-900 sm:w-auto sm:py-2 sm:text-sm flex-shrink-0"
         >
           <Plus class="h-4 w-4" />
@@ -220,10 +172,8 @@ function toggleAll() {
         </button>
       </div>
 
-      <!-- Stats -->
       <MemberStats :statistics="statistics" />
 
-      <!-- Toolbar + filters -->
       <DataTableToolbar
         v-model="table.search.value"
         placeholder="Search by name, email, phone or member no..."
@@ -237,14 +187,12 @@ function toggleAll() {
         </template>
       </DataTableToolbar>
 
-      <!-- Bulk actions -->
       <BulkActions
         :selected="table.selected.value"
         @clear="table.clearSelection"
         @action="handleBulkAction"
       />
 
-      <!-- Table (scrolls horizontally on small screens) -->
       <div class="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:overflow-visible sm:px-0">
         <div class="min-w-[720px] sm:min-w-0">
           <DataTable
@@ -288,7 +236,6 @@ function toggleAll() {
         </div>
       </div>
 
-      <!-- Pagination -->
       <DataTablePagination
         :current-page="members.meta?.current_page ?? 1"
         :last-page="members.meta?.last_page ?? 1"
@@ -301,34 +248,23 @@ function toggleAll() {
       />
     </div>
 
-    <!-- Create / Edit modal -->
-    <SlideOver
-      :open="modalMode !== null"
-      :title="modalMode === 'create' ? 'Add Member' : 'Edit Member'"
-      :description="
-        modalMode === 'create'
-          ? 'Register a new member to the party database.'
-          : editingMember
-            ? `Update details for ${editingMember.first_name} ${editingMember.last_name}.`
-            : ''
-      "
-      size="lg"
-      side="right"
-      @close="closeModal"
-    >
-      <MemberForm
-        v-if="modalMode"
-        :form="form"
-        :submit-label="modalMode === 'create' ? 'Create member' : 'Save changes'"
-        :password-optional="modalMode === 'edit'"
-        :states="formOptions.states"
-        :zones="formOptions.zones"
-        :lgas="formOptions.lgas"
-        :wards="formOptions.wards"
-        :pus="formOptions.pus"
-        @submit="submitForm"
-        @cancel="closeModal"
-      />
-    </SlideOver>
+    <CreateMember
+      :open="creating"
+      :form-options="formOptions"
+      @close="closeCreate"
+    />
+
+    <EditMember
+      :member="editingMember"
+      :form-options="formOptions"
+      @close="closeEdit"
+    />
+
+    <ViewMember
+      v-if="viewingMember"
+      :member="viewingMember"
+      @close="closeView"
+      @edit="editFromView"
+    />
   </AppLayout>
 </template>
